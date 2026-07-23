@@ -1,0 +1,20 @@
+[build]
+  publish = "."
+  command = "npm install"
+  functions = "netlify/functions"
+
+[build.environment]
+  # Only genuinely public values belong here — anything meant to appear in
+  # client-facing output. index.html hardcodes the Supabase/Paystack ones
+  # on purpose; B2_BUCKET_NAME is embedded in every public photo URL
+  # b2-sign-upload.js returns to the browser, so it's expected to show up
+  # in output too. Real secrets (B2 key/key ID/account ID, Paystack secret
+  # key, Supabase service role key, Gemini key) must NOT be added to this
+  # list: if the scanner ever flags one of them, that's a real leak you
+  # want it to catch, not suppress.
+  SECRETS_SCAN_OMIT_KEYS = "SUPABASE_URL, SUPABASE_ANON_KEY, PAYSTACK_PUBLIC_KEY, B2_BUCKET_NAME"
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
